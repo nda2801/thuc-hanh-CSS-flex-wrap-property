@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ví dụ 2: flex-wrap: wrap | CSS Flexbox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: rgba(17, 24, 39, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.3);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top center, #064e3b 0%, #0b0f19 70%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            color: #34d399;
+            transform: translateX(-4px);
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            margin-bottom: 2rem;
+        }
+
+        .controls-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .control-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.45rem 0.75rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select option {
+            background: #111827;
+            color: #fff;
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .preview-area {
+            position: relative;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: width 0.2s ease;
+            margin: 0 auto 1.5rem auto;
+            max-width: 100%;
+        }
+
+        .preview-area::before {
+            content: "Flex Container (flex-wrap: wrap)";
+            position: absolute;
+            top: -11px;
+            left: 16px;
+            background: #065f46;
+            color: #a7f3d0;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.1rem 0.6rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap; /* TÂM ĐIỂM BÀI HỌC */
+            gap: 12px;
+            min-height: 240px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .flex-item {
+            flex: 0 0 160px;
+            height: 90px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #ffffff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s ease;
+            user-select: none;
+        }
+
+        .flex-item:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .flex-item span.sub {
+            font-size: 0.75rem;
+            font-weight: 500;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .flex-item:nth-child(1) { background: linear-gradient(135deg, #10b981, #047857); }
+        .flex-item:nth-child(2) { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .flex-item:nth-child(3) { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .flex-item:nth-child(4) { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .flex-item:nth-child(5) { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .flex-item:nth-child(6) { background: linear-gradient(135deg, #ec4899, #db2777); }
+        .flex-item:nth-child(7) { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .flex-item:nth-child(8) { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+        .flex-item:nth-child(9) { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .flex-item:nth-child(10) { background: linear-gradient(135deg, #f97316, #ea580c); }
+
+        .explain-box {
+            background: rgba(16, 185, 129, 0.08);
+            border-left: 4px solid var(--accent);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .explain-box h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #6ee7b7;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.25rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e6edf3;
+            overflow-x: auto;
+        }
+
+        .code-keyword { color: #ff7b72; }
+        .code-prop { color: #79c0ff; }
+        .code-val { color: #a5d6ff; }
+        .code-comment { color: #8b949e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-link">← Quay lại trang chủ thực hành</a>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">CSS Flexbox Series</div>
+        </nav>
+
+        <header class="header">
+            <span class="badge">Bọc xuống dòng tự động</span>
+            <h1>flex-wrap: wrap</h1>
+            <p class="subtitle">
+                Khi không gian trên hàng hiện tại không còn đủ chứa item tiếp theo, <code>flex-wrap: wrap</code> sẽ tự động bọc các flex item sang <strong>dòng mới theo chiều từ trên xuống dưới</strong> (theo trục chéo Cross Axis).
+            </p>
+        </header>
+
+        <main class="card">
+            <!-- Điều khiển tương tác -->
+            <div class="controls-box">
+                <div class="control-group">
+                    <label for="widthRange">Chiều rộng container:</label>
+                    <input type="range" id="widthRange" min="320" max="950" value="600" style="width: 140px;">
+                    <span id="widthValue" style="font-family: 'Fira Code'; font-size: 0.85rem; color: #34d399;">600px</span>
+                </div>
+
+                <div class="control-group">
+                    <label for="alignContentSelect">align-content:</label>
+                    <select id="alignContentSelect">
+                        <option value="flex-start">flex-start</option>
+                        <option value="center">center</option>
+                        <option value="flex-end">flex-end</option>
+                        <option value="space-between">space-between</option>
+                        <option value="space-around">space-around</option>
+                        <option value="stretch">stretch</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <button class="btn" onclick="addItem()">+ Thêm Item</button>
+                    <button class="btn" onclick="removeItem()">- Bớt Item</button>
+                </div>
+            </div>
+
+            <!-- Khu vực hiển thị -->
+            <div class="preview-area" id="previewArea" style="width: 600px;">
+                <div class="flex-container" id="flexContainer">
+                    <div class="flex-item">Item 1<span class="sub">160px</span></div>
+                    <div class="flex-item">Item 2<span class="sub">160px</span></div>
+                    <div class="flex-item">Item 3<span class="sub">160px</span></div>
+                    <div class="flex-item">Item 4<span class="sub">160px</span></div>
+                    <div class="flex-item">Item 5<span class="sub">160px</span></div>
+                    <div class="flex-item">Item 6<span class="sub">160px</span></div>
+                </div>
+            </div>
+
+            <div class="explain-box">
+                <h3>💡 Tính năng nổi bật & Mẹo chuyên gia:</h3>
+                <p>
+                    1. <strong>Tự động tính toán số cột:</strong> Với item rộng 160px + gap 12px, container 600px chứa được đúng 3 item/hàng. Các item tiếp theo tự động nhảy xuống hàng 2.<br>
+                    2. <strong>Sức mạnh của align-content:</strong> Thuộc tính <code>align-content</code> chỉ phát huy tác dụng khi flex container có <strong>nhiều dòng</strong> (nhờ <code>flex-wrap: wrap</code>). Bạn hãy thử đổi <code>align-content</code> ở menu phía trên để thấy cách các hàng được phân bổ không gian dọc!
+                </p>
+            </div>
+
+            <!-- Khối code CSS -->
+            <pre class="code-block"><code><span class="code-comment">/* CSS áp dụng cho Flex Container */</span>
+<span class="code-keyword">.flex-container</span> {
+    <span class="code-prop">display</span>: <span class="code-val">flex</span>;
+    <span class="code-prop">flex-wrap</span>: <span class="code-val">wrap</span>; <span class="code-comment">/* Cho phép bọc sang nhiều dòng */</span>
+    <span class="code-prop">align-content</span>: <span id="codeAlignContent" class="code-val">flex-start</span>; <span class="code-comment">/* Căn chỉnh các dòng dọc trục chéo */</span>
+    <span class="code-prop">gap</span>: <span class="code-val">12px</span>;
+}
+
+<span class="code-keyword">.flex-item</span> {
+    <span class="code-prop">flex</span>: <span class="code-val">0 0 160px</span>; <span class="code-comment">/* Giữ cố định kích thước 160px để quan sát bọc dòng */</span>
+    <span class="code-prop">height</span>: <span class="code-val">90px</span>;
+}</code></pre>
+        </main>
+    </div>
+
+    <script>
+        const previewArea = document.getElementById('previewArea');
+        const flexContainer = document.getElementById('flexContainer');
+        const widthRange = document.getElementById('widthRange');
+        const widthValue = document.getElementById('widthValue');
+        const alignContentSelect = document.getElementById('alignContentSelect');
+        const codeAlignContent = document.getElementById('codeAlignContent');
+
+        widthRange.addEventListener('input', (e) => {
+            const val = e.target.value;
+            previewArea.style.width = val + 'px';
+            widthValue.textContent = val + 'px';
+        });
+
+        alignContentSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            flexContainer.style.alignContent = val;
+            codeAlignContent.textContent = val;
+        });
+
+        function addItem() {
+            const count = flexContainer.children.length + 1;
+            if (count > 12) return;
+            const item = document.createElement('div');
+            item.className = 'flex-item';
+            item.innerHTML = `Item ${count}<span class="sub">160px</span>`;
+            flexContainer.appendChild(item);
+        }
+
+        function removeItem() {
+            if (flexContainer.children.length > 2) {
+                flexContainer.removeChild(flexContainer.lastElementChild);
+            }
+        }
+    </script>
+</body>
+</html>

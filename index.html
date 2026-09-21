@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Thực hành CSS flex-wrap property: Tổng hợp lý thuyết, bộ giả lập tương tác trực quan, ví dụ so sánh nowrap, wrap, wrap-reverse, initial và ứng dụng thực tế.">
+    <title>[Thực hành] CSS | flex-wrap property - Hướng dẫn & Giả lập tương tác</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-body: #080c14;
+            --bg-surface: #0f172a;
+            --bg-surface-elevated: #1e293b;
+            --bg-card: rgba(17, 24, 39, 0.75);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-medium: rgba(255, 255, 255, 0.16);
+            --border-highlight: rgba(59, 130, 246, 0.4);
+            
+            --primary: #3b82f6;
+            --primary-light: #60a5fa;
+            --primary-glow: rgba(59, 130, 246, 0.35);
+            
+            --success: #10b981;
+            --success-light: #34d399;
+            --success-glow: rgba(16, 185, 129, 0.35);
+            
+            --warning: #f59e0b;
+            --warning-light: #fbbf24;
+            --warning-glow: rgba(245, 158, 11, 0.35);
+            
+            --accent-pink: #ec4899;
+            --accent-purple: #8b5cf6;
+            
+            --text-primary: #f9fafb;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 25px -3px rgba(0, 0, 0, 0.45);
+            --shadow-lg: 0 20px 40px -5px rgba(0, 0, 0, 0.6);
+            
+            --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 20%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 80%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            line-height: 1.65;
+            min-height: 100vh;
+        }
+
+        /* TOP NAVIGATION */
+        .header-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.9rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-light);
+        }
+
+        .btn-github {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-medium);
+            padding: 0.45rem 1rem;
+            border-radius: var(--radius-full);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-github:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        /* WRAPPER */
+        .main-wrapper {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 6rem 1.5rem;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 2.5rem 1rem 1rem 1rem;
+        }
+
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--primary-light);
+            padding: 0.4rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+        }
+
+        h1.hero-title {
+            font-size: clamp(2.2rem, 5vw, 3.4rem);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, #ffffff 30%, #93c5fd 80%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 780px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .hero-syntax-box {
+            display: inline-block;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            padding: 0.85rem 1.75rem;
+            border-radius: var(--radius-md);
+            font-family: 'Fira Code', monospace;
+            font-size: 1.05rem;
+            color: #60a5fa;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-syntax-box span.syntax-prop { color: #f472b6; font-weight: 600; }
+        .hero-syntax-box span.syntax-val { color: #34d399; font-weight: 600; }
+
+        /* SECTION STYLING */
+        .section-block {
+            margin-bottom: 5rem;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 0.85rem;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--text-primary);
+        }
+
+        .section-title span.number {
+            color: var(--primary-light);
+            font-family: 'Fira Code', monospace;
+            font-size: 1.3rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* THEORY CARDS GRID */
+        .theory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .theory-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .theory-card:hover {
+            border-color: var(--border-medium);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .theory-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--card-color, #3b82f6), transparent);
+        }
+
+        .theory-card.card-nowrap { --card-color: var(--primary); }
+        .theory-card.card-wrap { --card-color: var(--success); }
+        .theory-card.card-reverse { --card-color: var(--warning); }
+        .theory-card.card-initial { --card-color: var(--accent-pink); }
+
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.85rem;
+        }
+
+        .card-val-name {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .tag-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.05em;
+        }
+
+        .tag-pill.default {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        .tag-pill.popular {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .tag-pill.reverse {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .tag-pill.keyword {
+            background: rgba(236, 72, 153, 0.2);
+            color: #f472b6;
+            border: 1px solid rgba(236, 72, 153, 0.4);
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.55;
+            margin-bottom: 1.25rem;
+            flex-grow: 1;
+        }
+
+        .card-mini-demo {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem;
+            display: flex;
+            gap: 6px;
+            height: 52px;
+            align-items: center;
+        }
+
+        .mini-item {
+            height: 32px;
+            width: 32px;
+            border-radius: 4px;
+            background: var(--card-color, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        /* TABLE */
+        .table-container {
+            overflow-x: auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            backdrop-filter: blur(12px);
+        }
+
+        table.comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        table.comparison-table th {
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--text-primary);
+            font-weight: 700;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-medium);
+        }
+
+        table.comparison-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            vertical-align: middle;
+        }
+
+        table.comparison-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-primary);
+        }
+
+        /* INTERACTIVE PLAYGROUND */
+        .playground-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .playground-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .playground-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .control-panel {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-item label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-item label span.val-display {
+            color: var(--primary-light);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .pill-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .pill-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 0.55rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-family: 'Fira Code', monospace;
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+
+        .pill-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .pill-btn.active {
+            background: var(--primary);
+            border-color: var(--primary-light);
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        select.custom-select {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-medium);
+            color: var(--text-primary);
+            padding: 0.6rem 0.85rem;
+            border-radius: var(--radius-sm);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select.custom-select option {
+            background: #0f172a;
+            color: #fff;
+        }
+
+        input[type="range"].range-slider {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .action-btn-group {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 0.6rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: var(--border-medium);
+        }
+
+        .stage-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .preview-wrapper {
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            min-height: 380px;
+            overflow: auto;
+            transition: width 0.2s ease, height 0.2s ease;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .preview-wrapper::before {
+            content: "Flex Container Live Stage";
+            position: absolute;
+            top: -11px;
+            left: 16px;
+            background: #1e293b;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.75rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .live-flex-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            width: 100%;
+            height: 100%;
+            min-height: 340px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stage-item {
+            width: 140px;
+            height: 85px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #ffffff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .stage-item:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .stage-item span.title {
+            font-size: 1.05rem;
+        }
+
+        .stage-item span.subinfo {
+            font-size: 0.72rem;
+            opacity: 0.85;
+            font-weight: 500;
+            margin-top: 2px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Color palettes for items */
+        .color-1 { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .color-2 { background: linear-gradient(135deg, #059669, #047857); }
+        .color-3 { background: linear-gradient(135deg, #d97706, #b45309); }
+        .color-4 { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+        .color-5 { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .color-6 { background: linear-gradient(135deg, #db2777, #be185d); }
+        .color-7 { background: linear-gradient(135deg, #0891b2, #0e7490); }
+        .color-8 { background: linear-gradient(135deg, #4f46e5, #4338ca); }
+        .color-9 { background: linear-gradient(135deg, #16a34a, #15803d); }
+        .color-10 { background: linear-gradient(135deg, #ea580c, #c2410c); }
+
+        /* CODE OUTPUT PREVIEW */
+        .code-output-card {
+            background: #090d16;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .code-output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.75rem 1.25rem;
+        }
+
+        .code-output-header span {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .btn-copy {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--primary-light);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.35rem 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-copy:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .code-editor-content {
+            padding: 1.25rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .c-sel { color: #f472b6; font-weight: 600; }
+        .c-prop { color: #60a5fa; }
+        .c-val { color: #34d399; }
+        .c-comm { color: #64748b; font-style: italic; }
+
+        /* SIMULTANEOUS 4-VALUE MATRIX */
+        .matrix-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .matrix-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .matrix-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .matrix-header h4 {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .matrix-stage {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem;
+            min-height: 180px;
+            overflow: hidden;
+            display: flex;
+            gap: 8px;
+            align-content: flex-start;
+        }
+
+        .matrix-stage.f-nowrap { flex-wrap: nowrap; }
+        .matrix-stage.f-wrap { flex-wrap: wrap; }
+        .matrix-stage.f-reverse { flex-wrap: wrap-reverse; }
+        .matrix-stage.f-initial { flex-wrap: initial; }
+
+        .m-item {
+            flex: 0 0 75px;
+            height: 50px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* REAL WORLD USE CASES */
+        .use-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .use-case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .use-case-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary-light);
+            background: rgba(59, 130, 246, 0.12);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            width: fit-content;
+        }
+
+        .use-case-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        /* Use Case 1: Tag Cloud */
+        .tag-cloud-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .tag-chip {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border-subtle);
+            padding: 0.35rem 0.85rem;
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            user-select: none;
+        }
+
+        .tag-chip:hover, .tag-chip.active {
+            background: var(--primary);
+            border-color: var(--primary-light);
+            color: #fff;
+        }
+
+        /* Use Case 2: Product Grid */
+        .product-grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .prod-card {
+            flex: 1 1 130px;
+            background: #1e293b;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: var(--transition-smooth);
+        }
+
+        .prod-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .prod-thumb {
+            height: 65px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #334155, #1e293b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .prod-title { font-size: 0.82rem; font-weight: 700; }
+        .prod-price { font-size: 0.78rem; color: #34d399; font-weight: 600; }
+
+        /* Use Case 3: Responsive Nav Toolbar */
+        .toolbar-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .toolbar-brand {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .t-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-subtle);
+            color: #e2e8f0;
+            padding: 0.35rem 0.65rem;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            cursor: pointer;
+        }
+
+        .t-btn.primary {
+            background: var(--primary);
+            border-color: var(--primary-light);
+            color: #fff;
+        }
+
+        /* STANDALONE LINKS SECTION */
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .example-link-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(12px);
+        }
+
+        .example-link-card:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .el-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .el-icon.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        .el-icon.green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .el-icon.amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .el-icon.pink { background: rgba(236, 72, 153, 0.15); color: #f472b6; }
+
+        .el-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .el-desc {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .el-action {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: auto;
+        }
+
+        /* QUIZ SECTION */
+        .quiz-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .quiz-question {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-opt {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .quiz-opt:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+
+        .quiz-opt.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            color: #6ee7b7;
+            font-weight: 600;
+        }
+
+        .quiz-opt.wrong {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        .quiz-feedback {
+            font-size: 0.88rem;
+            line-height: 1.5;
+            padding: 0.85rem 1rem;
+            border-radius: var(--radius-sm);
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        /* FOOTER */
+        footer.page-footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1e293b;
+            color: #fff;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--primary);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+    <header class="header-nav">
+        <a href="#hero" class="brand-logo">
+            <div class="brand-icon">F</div>
+            <span>CSS flex-wrap</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#ly-thuyet">Lý Thuyết</a></li>
+            <li><a href="#playground">Bộ Giả Lập</a></li>
+            <li><a href="#so-sanh">So Sánh 4 Giá Trị</a></li>
+            <li><a href="#ung-dung">Ứng Dụng Thực Tế</a></li>
+            <li><a href="#vi-du">Các Bài Ví Dụ</a></li>
+            <li><a href="#trac-nghiem">Trắc Nghiệm</a></li>
+        </ul>
+        <a href="https://github.com/nda2801/thuc-hanh-CSS-flex-wrap-property" target="_blank" rel="noopener" class="btn-github">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span>GitHub Repository</span>
+        </a>
+    </header>
+
+    <main class="main-wrapper">
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="pill-badge">CSS Flexible Box Layout</div>
+            <h1 class="hero-title">[Thực hành] Thuộc tính CSS flex-wrap</h1>
+            <p class="hero-desc">
+                Thuộc tính <strong>flex-wrap</strong> trong CSS được sử dụng để chỉ định xem các <strong>flex items</strong> được ép buộc nằm trên một dòng duy nhất hay được bọc thành nhiều dòng khi vượt quá kích thước của container.
+            </p>
+            <div class="hero-syntax-box">
+                <span class="syntax-prop">flex-wrap</span>: <span class="syntax-val">nowrap | wrap | wrap-reverse | initial</span>;
+            </div>
+        </section>
+
+        <!-- SECTION 1: LÝ THUYẾT & CÚ PHÁP -->
+        <section class="section-block" id="ly-thuyet">
+            <div class="section-header">
+                <h2 class="section-title"><span class="number">01.</span> Lý Thuyết Trọng Tâm & Bảng Giá Trị</h2>
+                <div class="section-subtitle">Chi tiết 4 giá trị cốt lõi và cơ chế vận hành</div>
+            </div>
+
+            <div class="theory-grid">
+                <!-- Card 1: nowrap -->
+                <div class="theory-card card-nowrap">
+                    <div class="card-header-flex">
+                        <span class="card-val-name">nowrap</span>
+                        <span class="tag-pill default">Mặc định</span>
+                    </div>
+                    <p class="card-text">
+                        Tất cả các flex item đều được ép nằm trên <strong>một dòng duy nhất</strong>. Nếu tổng kích thước các item vượt quá container, chúng sẽ tự co nhỏ lại (theo <code>flex-shrink</code>) hoặc tràn ra ngoài container.
+                    </p>
+                    <div class="card-mini-demo">
+                        <div class="mini-item">1</div>
+                        <div class="mini-item">2</div>
+                        <div class="mini-item">3</div>
+                        <div class="mini-item">4</div>
+                        <div class="mini-item">5</div>
+                    </div>
+                </div>
+
+                <!-- Card 2: wrap -->
+                <div class="theory-card card-wrap">
+                    <div class="card-header-flex">
+                        <span class="card-val-name">wrap</span>
+                        <span class="tag-pill popular">Phổ biến</span>
+                    </div>
+                    <p class="card-text">
+                        Khi hàng hiện tại không còn đủ không gian cho item kế tiếp, các flex item sẽ được <strong>bọc sang dòng mới từ trên xuống dưới</strong> (dọc theo hướng trục phụ Cross-Axis).
+                    </p>
+                    <div class="card-mini-demo" style="flex-wrap: wrap;">
+                        <div class="mini-item">1</div>
+                        <div class="mini-item">2</div>
+                        <div class="mini-item">3</div>
+                        <div class="mini-item">4</div>
+                        <div class="mini-item">5</div>
+                    </div>
+                </div>
+
+                <!-- Card 3: wrap-reverse -->
+                <div class="theory-card card-reverse">
+                    <div class="card-header-flex">
+                        <span class="card-val-name">wrap-reverse</span>
+                        <span class="tag-pill reverse">Đảo ngược</span>
+                    </div>
+                    <p class="card-text">
+                        Đảo ngược chiều của trục chéo (cross-axis). Các dòng mới sẽ được <strong>xếp ngược từ dưới lên trên</strong> (dòng đầu tiên ở dưới đáy, dòng thứ hai xếp lên phía trên).
+                    </p>
+                    <div class="card-mini-demo" style="flex-wrap: wrap-reverse;">
+                        <div class="mini-item">1</div>
+                        <div class="mini-item">2</div>
+                        <div class="mini-item">3</div>
+                        <div class="mini-item">4</div>
+                        <div class="mini-item">5</div>
+                    </div>
+                </div>
+
+                <!-- Card 4: initial -->
+                <div class="theory-card card-initial">
+                    <div class="card-header-flex">
+                        <span class="card-val-name">initial</span>
+                        <span class="tag-pill keyword">W3C Reset</span>
+                    </div>
+                    <p class="card-text">
+                        Đặt thuộc tính trở về <strong>giá trị ban đầu mặc định</strong> theo thông số kỹ thuật W3C của CSS. Đối với <code>flex-wrap</code>, giá trị đó là <code>nowrap</code>.
+                    </p>
+                    <div class="card-mini-demo">
+                        <div class="mini-item">1</div>
+                        <div class="mini-item">2</div>
+                        <div class="mini-item">3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng so sánh tổng hợp -->
+            <div class="table-container">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Giá trị</th>
+                            <th>Hành vi khi tràn</th>
+                            <th>Hướng bọc dòng (Cross Axis)</th>
+                            <th>Tác động tới align-content</th>
+                            <th>Tình huống sử dụng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong style="color: #60a5fa; font-family: 'Fira Code';">nowrap</strong></td>
+                            <td>Không bọc; co nhỏ (flex-shrink) hoặc overflow</td>
+                            <td>Chỉ có 1 dòng duy nhất</td>
+                            <td>Không có tác dụng</td>
+                            <td>Thanh cuộn ngang, breadcrumb, tab bar 1 hàng</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #34d399; font-family: 'Fira Code';">wrap</strong></td>
+                            <td>Tự động nhảy sang dòng mới</td>
+                            <td>Từ trên xuống dưới (top to bottom)</td>
+                            <td>Kích hoạt toàn bộ sức mạnh</td>
+                            <td>Lưới sản phẩm responsive, danh sách thẻ tag, gallery</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #fbbf24; font-family: 'Fira Code';">wrap-reverse</strong></td>
+                            <td>Tự động nhảy sang dòng mới</td>
+                            <td>Từ dưới lên trên (bottom to top)</td>
+                            <td>Kích hoạt theo trục ngược</td>
+                            <td>Hộp thoại chat, dropdown drawer, xếp chồng ngược</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #f472b6; font-family: 'Fira Code';">initial</strong></td>
+                            <td>Trở về giá trị chuẩn W3C (nowrap)</td>
+                            <td>1 dòng duy nhất</td>
+                            <td>Không có tác dụng</td>
+                            <td>Reset CSS hoặc ghi đè kiểu dáng từ thư viện ngoài</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION 2: BỘ GIẢ LẬP TƯƠNG TÁC (INTERACTIVE PLAYGROUND) -->
+        <section class="section-block" id="playground">
+            <div class="section-header">
+                <h2 class="section-title"><span class="number">02.</span> Bộ Giả Lập Tương Tác Trực Quan</h2>
+                <div class="section-subtitle">Tùy biến trực tiếp mọi tham số flexbox và quan sát tức thì</div>
+            </div>
+
+            <div class="playground-card">
+                <div class="playground-layout">
+                    <!-- Bảng điều khiển (Sidebar Controls) -->
+                    <aside class="control-panel">
+                        <div class="control-item">
+                            <label>flex-wrap</label>
+                            <div class="pill-group" id="flexWrapGroup">
+                                <button class="pill-btn active" data-value="nowrap">nowrap</button>
+                                <button class="pill-btn" data-value="wrap">wrap</button>
+                                <button class="pill-btn" data-value="wrap-reverse">wrap-reverse</button>
+                                <button class="pill-btn" data-value="initial">initial</button>
+                            </div>
+                        </div>
+
+                        <div class="control-item">
+                            <label for="flexDirectionSelect">flex-direction</label>
+                            <select id="flexDirectionSelect" class="custom-select">
+                                <option value="row">row (ngang, trái qua phải)</option>
+                                <option value="row-reverse">row-reverse (ngang, phải qua trái)</option>
+                                <option value="column">column (dọc, trên xuống dưới)</option>
+                                <option value="column-reverse">column-reverse (dọc, dưới lên trên)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-item">
+                            <label for="alignContentSelect">
+                                align-content
+                                <span style="font-size: 0.72rem; color: #94a3b8;">(khi có nhiều hàng)</span>
+                            </label>
+                            <select id="alignContentSelect" class="custom-select">
+                                <option value="flex-start">flex-start</option>
+                                <option value="center">center</option>
+                                <option value="flex-end">flex-end</option>
+                                <option value="space-between">space-between</option>
+                                <option value="space-around">space-around</option>
+                                <option value="stretch">stretch</option>
+                            </select>
+                        </div>
+
+                        <div class="control-item">
+                            <label for="justifyContentSelect">justify-content</label>
+                            <select id="justifyContentSelect" class="custom-select">
+                                <option value="flex-start">flex-start</option>
+                                <option value="center">center</option>
+                                <option value="flex-end">flex-end</option>
+                                <option value="space-between">space-between</option>
+                                <option value="space-around">space-around</option>
+                                <option value="space-evenly">space-evenly</option>
+                            </select>
+                        </div>
+
+                        <div class="control-item">
+                            <label for="widthRange">
+                                Chiều rộng Container
+                                <span class="val-display" id="widthDisplay">100%</span>
+                            </label>
+                            <input type="range" id="widthRange" class="range-slider" min="320" max="850" value="700">
+                        </div>
+
+                        <div class="control-item">
+                            <label for="itemWidthRange">
+                                Chiều rộng Item (flex-basis)
+                                <span class="val-display" id="itemWidthDisplay">140px</span>
+                            </label>
+                            <input type="range" id="itemWidthRange" class="range-slider" min="90" max="220" value="140">
+                        </div>
+
+                        <div class="control-item">
+                            <label for="gapRange">
+                                Khoảng cách gap
+                                <span class="val-display" id="gapDisplay">14px</span>
+                            </label>
+                            <input type="range" id="gapRange" class="range-slider" min="0" max="32" value="14">
+                        </div>
+
+                        <div class="control-item">
+                            <label>Thao tác Item</label>
+                            <div class="action-btn-group">
+                                <button class="action-btn" id="btnAddItem">+ Thêm</button>
+                                <button class="action-btn" id="btnRemoveItem">- Xóa</button>
+                                <button class="action-btn" id="btnResetItems">Reset (6)</button>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Khung sân khấu hiển thị (Live Stage) -->
+                    <div class="stage-area">
+                        <div class="preview-wrapper" id="previewWrapper" style="width: 700px; max-width: 100%;">
+                            <div class="live-flex-box" id="liveFlexBox">
+                                <div class="stage-item color-1"><span class="title">Item 1</span><span class="subinfo">140px</span></div>
+                                <div class="stage-item color-2"><span class="title">Item 2</span><span class="subinfo">140px</span></div>
+                                <div class="stage-item color-3"><span class="title">Item 3</span><span class="subinfo">140px</span></div>
+                                <div class="stage-item color-4"><span class="title">Item 4</span><span class="subinfo">140px</span></div>
+                                <div class="stage-item color-5"><span class="title">Item 5</span><span class="subinfo">140px</span></div>
+                                <div class="stage-item color-6"><span class="title">Item 6</span><span class="subinfo">140px</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Mã CSS sinh tự động -->
+                        <div class="code-output-card">
+                            <div class="code-output-header">
+                                <span>Mã nguồn CSS tương ứng (Live Generated CSS)</span>
+                                <button class="btn-copy" id="btnCopyCode" onclick="copyCssCode()">Sao chép CSS</button>
+                            </div>
+                            <pre class="code-editor-content"><code id="codeSnippet"><span class="c-sel">.container</span> {
+  <span class="c-prop">display</span>: <span class="c-val">flex</span>;
+  <span class="c-prop">flex-wrap</span>: <span class="c-val" id="cssWrapVal">nowrap</span>;
+  <span class="c-prop">flex-direction</span>: <span class="c-val" id="cssDirVal">row</span>;
+  <span class="c-prop">justify-content</span>: <span class="c-val" id="cssJustifyVal">flex-start</span>;
+  <span class="c-prop">align-content</span>: <span class="c-val" id="cssAlignVal">flex-start</span>;
+  <span class="c-prop">gap</span>: <span class="c-val" id="cssGapVal">14px</span>;
+}
+
+<span class="c-sel">.item</span> {
+  <span class="c-prop">flex</span>: <span class="c-val" id="cssItemBasisVal">0 0 140px</span>;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: SO SÁNH ĐỒNG THỜI 4 GIÁ TRỊ -->
+        <section class="section-block" id="so-sanh">
+            <div class="section-header">
+                <h2 class="section-title"><span class="number">03.</span> So Sánh Trực Tiếp 4 Giá Trị Đồng Thời</h2>
+                <div class="section-subtitle">Kéo thanh trượt để quan sát sự khác biệt khi cùng kích thước container</div>
+            </div>
+
+            <div style="background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <label for="syncSlider" style="font-weight: 700; color: var(--text-secondary); font-size: 0.9rem;">
+                    Độ rộng container chung:
+                </label>
+                <input type="range" id="syncSlider" class="range-slider" min="260" max="600" value="450" style="max-width: 300px;">
+                <span id="syncDisplay" style="font-family: 'Fira Code'; color: var(--primary-light); font-weight: 600;">450px</span>
+            </div>
+
+            <div class="matrix-container">
+                <!-- Box 1: nowrap -->
+                <div class="matrix-box">
+                    <div class="matrix-header">
+                        <h4>flex-wrap: nowrap</h4>
+                        <span class="tag-pill default">1 Dòng</span>
+                    </div>
+                    <div class="matrix-stage f-nowrap sync-stage" style="width: 450px;">
+                        <div class="m-item color-1">1</div>
+                        <div class="m-item color-2">2</div>
+                        <div class="m-item color-3">3</div>
+                        <div class="m-item color-4">4</div>
+                        <div class="m-item color-5">5</div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                        Không bao giờ xuống dòng. Các item sẽ co nhỏ hoặc tràn ra nếu không gian không đủ.
+                    </p>
+                </div>
+
+                <!-- Box 2: wrap -->
+                <div class="matrix-box">
+                    <div class="matrix-header">
+                        <h4>flex-wrap: wrap</h4>
+                        <span class="tag-pill popular">Xuống Dòng</span>
+                    </div>
+                    <div class="matrix-stage f-wrap sync-stage" style="width: 450px;">
+                        <div class="m-item color-1">1</div>
+                        <div class="m-item color-2">2</div>
+                        <div class="m-item color-3">3</div>
+                        <div class="m-item color-4">4</div>
+                        <div class="m-item color-5">5</div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                        Tự động nhảy xuống dòng mới từ trên xuống dưới theo thứ tự tự nhiên.
+                    </p>
+                </div>
+
+                <!-- Box 3: wrap-reverse -->
+                <div class="matrix-box">
+                    <div class="matrix-header">
+                        <h4>flex-wrap: wrap-reverse</h4>
+                        <span class="tag-pill reverse">Bọc Ngược</span>
+                    </div>
+                    <div class="matrix-stage f-reverse sync-stage" style="width: 450px;">
+                        <div class="m-item color-1">1</div>
+                        <div class="m-item color-2">2</div>
+                        <div class="m-item color-3">3</div>
+                        <div class="m-item color-4">4</div>
+                        <div class="m-item color-5">5</div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                        Dòng mới được xếp ngược lên trên (item 1, 2, 3 nằm dưới đáy, item tiếp theo nằm ở trên).
+                    </p>
+                </div>
+
+                <!-- Box 4: initial -->
+                <div class="matrix-box">
+                    <div class="matrix-header">
+                        <h4>flex-wrap: initial</h4>
+                        <span class="tag-pill keyword">Mặc Định W3C</span>
+                    </div>
+                    <div class="matrix-stage f-initial sync-stage" style="width: 450px;">
+                        <div class="m-item color-1">1</div>
+                        <div class="m-item color-2">2</div>
+                        <div class="m-item color-3">3</div>
+                        <div class="m-item color-4">4</div>
+                        <div class="m-item color-5">5</div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                        Khôi phục về giá trị mặc định của thuộc tính theo chuẩn (tương đương <code>nowrap</code>).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ỨNG DỤNG THỰC TẾ TRONG THIẾT KẾ WEB -->
+        <section class="section-block" id="ung-dung">
+            <div class="section-header">
+                <h2 class="section-title"><span class="number">04.</span> Ứng Dụng Thực Tế Trong Thiết Kế Web</h2>
+                <div class="section-subtitle">Các pattern giao diện phổ biến sử dụng flex-wrap</div>
+            </div>
+
+            <div class="use-case-grid">
+                <!-- Case 1: Tag/Filter Cloud -->
+                <div class="use-case-card">
+                    <span class="use-case-badge">Use Case 1</span>
+                    <h3 class="use-case-title">Thanh Lọc Thẻ Tag / Danh Mục</h3>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        Khi người dùng có danh sách nhiều nhãn tag dài ngắn khác nhau, <code>flex-wrap: wrap</code> cho phép các tag tự sắp xếp hàng linh hoạt mà không sợ bị đè vỡ layout.
+                    </p>
+                    <div class="tag-cloud-container">
+                        <span class="tag-chip active">Tất cả</span>
+                        <span class="tag-chip">HTML5</span>
+                        <span class="tag-chip">CSS3 Flexbox</span>
+                        <span class="tag-chip">CSS Grid</span>
+                        <span class="tag-chip">JavaScript ES6</span>
+                        <span class="tag-chip">Responsive Web</span>
+                        <span class="tag-chip">Front-end</span>
+                        <span class="tag-chip">CodeGym</span>
+                    </div>
+                </div>
+
+                <!-- Case 2: Product Grid -->
+                <div class="use-case-card">
+                    <span class="use-case-badge">Use Case 2</span>
+                    <h3 class="use-case-title">Lưới Thẻ Sản Phẩm Responsive</h3>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        Kết hợp <code>flex: 1 1 130px</code> với <code>flex-wrap: wrap</code> tạo thành lưới co giãn mượt mà từ 2 đến 4 cột tùy độ rộng màn hình mà không cần viết media query.
+                    </p>
+                    <div class="product-grid-container">
+                        <div class="prod-card">
+                            <div class="prod-thumb">💻</div>
+                            <div class="prod-title">MacBook Pro</div>
+                            <div class="prod-price">34.990.000đ</div>
+                        </div>
+                        <div class="prod-card">
+                            <div class="prod-thumb">📱</div>
+                            <div class="prod-title">iPhone 15 Pro</div>
+                            <div class="prod-price">27.490.000đ</div>
+                        </div>
+                        <div class="prod-card">
+                            <div class="prod-thumb">🎧</div>
+                            <div class="prod-title">AirPods Max</div>
+                            <div class="prod-price">12.500.000đ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case 3: Responsive Nav Toolbar -->
+                <div class="use-case-card">
+                    <span class="use-case-badge">Use Case 3</span>
+                    <h3 class="use-case-title">Thanh Công Cụ Toolbar Linh Hoạt</h3>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        Khi thu nhỏ trình duyệt trên di động, thanh thao tác tự động ngắt dòng xuống bên dưới tiêu đề để các nút bấm không bị chèn ép.
+                    </p>
+                    <div class="toolbar-container">
+                        <div class="toolbar-brand">🛠 Dashboard Tools</div>
+                        <div class="toolbar-actions">
+                            <button class="t-btn">Xuất Excel</button>
+                            <button class="t-btn">Lọc</button>
+                            <button class="t-btn primary">+ Thêm mới</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: CÁC TRANG VÍ DỤ ĐỘC LẬP -->
+        <section class="section-block" id="vi-du">
+            <div class="section-header">
+                <h2 class="section-title"><span class="number">05.</span> Danh Sách Bài Tập Ví Dụ Độc Lập</h2>
+                <div class="section-subtitle">Từng file mã nguồn chuyên sâu cho từng giá trị để kiểm tra và nộp bài</div>
+            </div>
+
+            <div class="links-grid">
+                <!-- Link 1: vidu1.html -->
+                <a href="vidu1.html" class="example-link-card">
+                    <div class="el-icon blue">1</div>
+                    <div class="el-title">Ví dụ 1: flex-wrap: nowrap</div>
+                    <div class="el-desc">
+                        Khám phá chi tiết hiện tượng co giãn (flex-shrink) và cơ chế ngăn ngắt dòng trong container hẹp.
+                    </div>
+                    <div class="el-action">Xem ví dụ 1 →</div>
+                </a>
+
+                <!-- Link 2: vidu2.html -->
+                <a href="vidu2.html" class="example-link-card">
+                    <div class="el-icon green">2</div>
+                    <div class="el-title">Ví dụ 2: flex-wrap: wrap</div>
+                    <div class="el-desc">
+                        Thực hành chia nhiều dòng tự động kết hợp với thuộc tính align-content căn chỉnh không gian đa hàng.
+                    </div>
+                    <div class="el-action">Xem ví dụ 2 →</div>
+                </a>
+
+                <!-- Link 3: vidu3.html -->
+                <a href="vidu3.html" class="example-link-card">
+                    <div class="el-icon amber">3</div>
+                    <div class="el-title">Ví dụ 3: flex-wrap: wrap-reverse</div>
+                    <div class="el-desc">
+                        Quan sát trục chéo đảo ngược, dòng mới được đẩy lên trên cùng với thuật toán nhận diện hàng linh hoạt.
+                    </div>
+                    <div class="el-action">Xem ví dụ 3 →</div>
+                </a>
+
+                <!-- Link 4: vidu4.html -->
+                <a href="vidu4.html" class="example-link-card">
+                    <div class="el-icon pink">4</div>
+                    <div class="el-title">Ví dụ 4: flex-wrap: initial</div>
+                    <div class="el-desc">
+                        Hiểu cách từ khóa initial khôi phục về chuẩn W3C mặc định và kiểm tra computed styles qua JavaScript.
+                    </div>
+                    <div class="el-action">Xem ví dụ 4 →</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- SECTION 6: TRẮC NGHIỆM CỦNG CỐ KIẾN THỨC -->
+        <section class="section-block" id="trac-nghiem">
+            <div class="section-header">
+                <h2 class="section-title"><span class="number">06.</span> Trắc Nghiệm Củng Cố Kiến Thức</h2>
+                <div class="section-subtitle">Kiểm tra ngay mức độ hiểu bài của bạn</div>
+            </div>
+
+            <!-- Câu 1 -->
+            <div class="quiz-card" id="quiz1">
+                <div class="quiz-question">Câu 1: Giá trị mặc định của thuộc tính flex-wrap trong CSS là gì?</div>
+                <div class="quiz-options">
+                    <div class="quiz-opt" onclick="checkQuiz(1, this, false)">A. wrap</div>
+                    <div class="quiz-opt" onclick="checkQuiz(1, this, true)">B. nowrap</div>
+                    <div class="quiz-opt" onclick="checkQuiz(1, this, false)">C. wrap-reverse</div>
+                    <div class="quiz-opt" onclick="checkQuiz(1, this, false)">D. initial</div>
+                </div>
+                <div class="quiz-feedback" id="quizFeedback1"></div>
+            </div>
+
+            <!-- Câu 2 -->
+            <div class="quiz-card" id="quiz2">
+                <div class="quiz-question">Câu 2: Khi nào thì thuộc tính align-content trong Flexbox có tác dụng?</div>
+                <div class="quiz-options">
+                    <div class="quiz-opt" onclick="checkQuiz(2, this, false)">A. Khi flex container chỉ có đúng 1 dòng</div>
+                    <div class="quiz-opt" onclick="checkQuiz(2, this, true)">B. Khi flex container có nhiều dòng (multi-line) do flex-wrap: wrap hoặc wrap-reverse tạo ra</div>
+                    <div class="quiz-opt" onclick="checkQuiz(2, this, false)">C. Khi sử dụng flex-wrap: nowrap</div>
+                    <div class="quiz-opt" onclick="checkQuiz(2, this, false)">D. Luôn có tác dụng trong mọi trường hợp flexbox</div>
+                </div>
+                <div class="quiz-feedback" id="quizFeedback2"></div>
+            </div>
+
+            <!-- Câu 3 -->
+            <div class="quiz-card" id="quiz3">
+                <div class="quiz-question">Câu 3: Với flex-direction: row, giá trị wrap-reverse sẽ bọc các dòng mới theo hướng nào?</div>
+                <div class="quiz-options">
+                    <div class="quiz-opt" onclick="checkQuiz(3, this, false)">A. Từ trái sang phải</div>
+                    <div class="quiz-opt" onclick="checkQuiz(3, this, false)">B. Từ trên xuống dưới</div>
+                    <div class="quiz-opt" onclick="checkQuiz(3, this, true)">C. Từ dưới lên trên (dòng đầu ở đáy, dòng mới ở trên)</div>
+                    <div class="quiz-opt" onclick="checkQuiz(3, this, false)">D. Không bọc dòng</div>
+                </div>
+                <div class="quiz-feedback" id="quizFeedback3"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <p>Thực hành CSS Flexbox | Khóa Học Lập Trình Web Frontend</p>
+        <p style="margin-top: 0.5rem;">
+            Kho lưu trữ bài thực hành: 
+            <a href="https://github.com/nda2801/thuc-hanh-CSS-flex-wrap-property" target="_blank" rel="noopener">
+                github.com/nda2801/thuc-hanh-CSS-flex-wrap-property
+            </a>
+        </p>
+    </footer>
+
+    <!-- Toast copy feedback -->
+    <div class="toast" id="toastMessage">
+        <svg width="20" height="20" fill="none" stroke="#10b981" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span>Đã sao chép CSS vào clipboard!</span>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // DOM Elements for Playground
+        const liveFlexBox = document.getElementById('liveFlexBox');
+        const previewWrapper = document.getElementById('previewWrapper');
+        const flexWrapGroup = document.getElementById('flexWrapGroup');
+        const flexDirectionSelect = document.getElementById('flexDirectionSelect');
+        const alignContentSelect = document.getElementById('alignContentSelect');
+        const justifyContentSelect = document.getElementById('justifyContentSelect');
+        const widthRange = document.getElementById('widthRange');
+        const widthDisplay = document.getElementById('widthDisplay');
+        const itemWidthRange = document.getElementById('itemWidthRange');
+        const itemWidthDisplay = document.getElementById('itemWidthDisplay');
+        const gapRange = document.getElementById('gapRange');
+        const gapDisplay = document.getElementById('gapDisplay');
+        const btnAddItem = document.getElementById('btnAddItem');
+        const btnRemoveItem = document.getElementById('btnRemoveItem');
+        const btnResetItems = document.getElementById('btnResetItems');
+
+        // Output code DOMs
+        const cssWrapVal = document.getElementById('cssWrapVal');
+        const cssDirVal = document.getElementById('cssDirVal');
+        const cssJustifyVal = document.getElementById('cssJustifyVal');
+        const cssAlignVal = document.getElementById('cssAlignVal');
+        const cssGapVal = document.getElementById('cssGapVal');
+        const cssItemBasisVal = document.getElementById('cssItemBasisVal');
+
+        let currentWrap = 'nowrap';
+        const colorClasses = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'color-7', 'color-8', 'color-9', 'color-10'];
+
+        // Flex Wrap pill toggle
+        flexWrapGroup.querySelectorAll('.pill-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                flexWrapGroup.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentWrap = btn.dataset.value;
+                liveFlexBox.style.flexWrap = currentWrap;
+                cssWrapVal.textContent = currentWrap;
+            });
+        });
+
+        // Direction select
+        flexDirectionSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            liveFlexBox.style.flexDirection = val;
+            cssDirVal.textContent = val;
+        });
+
+        // Align Content select
+        alignContentSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            liveFlexBox.style.alignContent = val;
+            cssAlignVal.textContent = val;
+        });
+
+        // Justify Content select
+        justifyContentSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            liveFlexBox.style.justifyContent = val;
+            cssJustifyVal.textContent = val;
+        });
+
+        // Container Width slider
+        widthRange.addEventListener('input', (e) => {
+            const val = e.target.value;
+            previewWrapper.style.width = val + 'px';
+            widthDisplay.textContent = val + 'px';
+        });
+
+        // Item Width slider
+        itemWidthRange.addEventListener('input', (e) => {
+            const val = e.target.value;
+            itemWidthDisplay.textContent = val + 'px';
+            cssItemBasisVal.textContent = `0 0 ${val}px`;
+            const items = liveFlexBox.querySelectorAll('.stage-item');
+            items.forEach(item => {
+                item.style.width = val + 'px';
+                const sub = item.querySelector('.subinfo');
+                if (sub) sub.textContent = val + 'px';
+            });
+        });
+
+        // Gap slider
+        gapRange.addEventListener('input', (e) => {
+            const val = e.target.value;
+            liveFlexBox.style.gap = val + 'px';
+            gapDisplay.textContent = val + 'px';
+            cssGapVal.textContent = val + 'px';
+        });
+
+        // Add / Remove item buttons
+        btnAddItem.addEventListener('click', () => {
+            const count = liveFlexBox.children.length + 1;
+            if (count > 20) return;
+            const item = document.createElement('div');
+            const colorClass = colorClasses[(count - 1) % colorClasses.length];
+            item.className = `stage-item ${colorClass}`;
+            const currentItemWidth = itemWidthRange.value + 'px';
+            item.style.width = currentItemWidth;
+            item.innerHTML = `<span class="title">Item ${count}</span><span class="subinfo">${currentItemWidth}</span>`;
+            liveFlexBox.appendChild(item);
+        });
+
+        btnRemoveItem.addEventListener('click', () => {
+            if (liveFlexBox.children.length > 2) {
+                liveFlexBox.removeChild(liveFlexBox.lastElementChild);
+            }
+        });
+
+        btnResetItems.addEventListener('click', () => {
+            liveFlexBox.innerHTML = '';
+            for (let i = 1; i <= 6; i++) {
+                const item = document.createElement('div');
+                const colorClass = colorClasses[(i - 1) % colorClasses.length];
+                item.className = `stage-item ${colorClass}`;
+                const currentItemWidth = itemWidthRange.value + 'px';
+                item.style.width = currentItemWidth;
+                item.innerHTML = `<span class="title">Item ${i}</span><span class="subinfo">${currentItemWidth}</span>`;
+                liveFlexBox.appendChild(item);
+            }
+        });
+
+        // SYNC SLIDER FOR SECTION 3
+        const syncSlider = document.getElementById('syncSlider');
+        const syncDisplay = document.getElementById('syncDisplay');
+        const syncStages = document.querySelectorAll('.sync-stage');
+
+        syncSlider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            syncDisplay.textContent = val + 'px';
+            syncStages.forEach(stg => stg.style.width = val + 'px');
+        });
+
+        // COPY CODE TO CLIPBOARD
+        function copyCssCode() {
+            const textToCopy = `.container {
+  display: flex;
+  flex-wrap: ${currentWrap};
+  flex-direction: ${flexDirectionSelect.value};
+  justify-content: ${justifyContentSelect.value};
+  align-content: ${alignContentSelect.value};
+  gap: ${gapRange.value}px;
+}
+
+.item {
+  flex: 0 0 ${itemWidthRange.value}px;
+}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast();
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toastMessage');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // QUIZ LOGIC
+        function checkQuiz(qNum, element, isCorrect) {
+            const card = document.getElementById('quiz' + qNum);
+            const feedback = document.getElementById('quizFeedback' + qNum);
+            const allOpts = card.querySelectorAll('.quiz-opt');
+
+            allOpts.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                feedback.style.background = 'rgba(16, 185, 129, 0.15)';
+                feedback.style.color = '#6ee7b7';
+                feedback.style.border = '1px solid #10b981';
+                feedback.innerHTML = '🎉 <strong>Chính xác!</strong> ' + getQuizExplanation(qNum);
+            } else {
+                element.classList.add('wrong');
+                feedback.style.background = 'rgba(239, 68, 68, 0.15)';
+                feedback.style.color = '#fca5a5';
+                feedback.style.border = '1px solid #ef4444';
+                feedback.innerHTML = '❌ <strong>Chưa chính xác!</strong> ' + getQuizExplanation(qNum);
+            }
+            feedback.classList.add('show');
+        }
+
+        function getQuizExplanation(qNum) {
+            if (qNum === 1) return 'Giá trị mặc định của thuộc tính flex-wrap luôn là <code>nowrap</code>, ép các phần tử cùng nằm trên một hàng.';
+            if (qNum === 2) return 'Thuộc tính <code>align-content</code> quản lý khoảng cách giữa các hàng flex dọc theo trục chéo. Nếu chỉ có 1 hàng đơn lẻ, hãy dùng <code>align-items</code>.';
+            if (qNum === 3) return 'Với <code>flex-direction: row</code>, <code>wrap-reverse</code> sẽ xếp các dòng ngược chiều trục Y, đẩy hàng đầu tiên xuống đáy và các hàng tiếp theo lên phía trên.';
+            return '';
+        }
+    </script>
+</body>
+</html>
